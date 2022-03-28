@@ -3,14 +3,15 @@ from modelclass import *
 from PIL import Image
 import numpy as np
 import os
+import time
 
-DETECTION_THRESHOLD = 0.18
-NUM_THREADS = 7
+DETECTION_THRESHOLD = 0.25
+NUM_THREADS = 8
 
-PATH = r"C:\Users\enes_\Desktop\2" # 2.py belgesinin adresi / diğer adreslerde buraya bağlı olarak tanımlanmıştır
-TFLITE_MODEL_PATH = PATH + r"\efficientdet_lite0-portablegenerator-augmented.tflite" #.tflite dosyasının adresi
-DATA_PATH = PATH + r"\deneme_datasi" #resimlerin bulunduğu klasörün adresi
-OUT_PATH = PATH + r"\out.txt" #kordinatların .txt formatındaki çıktısı / gerekli dosyayı kendisi yaratır
+PATH = "/home/Github/ORG-STM-Bilgisayarli-Goru-Kodu/2" # 2.py belgesinin adresi / diğer adreslerde buraya bağlı olarak tanımlanmıştır
+TFLITE_MODEL_PATH = PATH + "/efficientdet_lite0-portablegenerator-augmented.tflite" #.tflite dosyasının adresi
+DATA_PATH = PATH + "/bos" #resimlerin bulunduğu klasörün adresi
+OUT_PATH = PATH + "/out.txt" #kordinatların .txt formatındaki çıktısı / gerekli dosyayı kendisi yaratır
 
 list_image = os.listdir(DATA_PATH)
 list_detections = []
@@ -21,8 +22,11 @@ options = ObjectDetectorOptions(
       
 )
 detector = ObjectDetector(model_path=TFLITE_MODEL_PATH, options=options)
+tick = time.time()
 j=0
 for i in list_image:
+    if j == 0:
+        print("Detection Started!")
     j+=1
     img_path = os.path.join(DATA_PATH,i)
     img = cv2.imread(img_path)
@@ -45,7 +49,10 @@ for i in list_image:
             
     #cv2.imshow("detection",image_np)
     count = len(list_image) - j
-    if count % 10 == 0:
+    if count == 0:
+        tock= time.time()
+        print("{} images processed in {} seconds!".format(j,tock-tick))
+    elif count % 10 == 0:
         print("Remaining image count: {}".format(count))
 
     if cv2.waitKey(1) == 27:
